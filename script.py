@@ -28,7 +28,7 @@ model = UNet(in_channels=1, out_channels=1, init_features=64)
 print(f"Using device: {device}")
 
 # Train model
-model, history = train_model(model, train_loader, val_loader, device, epochs=30, learning_rate=1e-3, alpha=0.1)
+model, history = train_model(model, train_loader, val_loader, device, epochs=50, learning_rate=1e-3, alpha=0.1)
 print("Training complete.")
 
 # Evaluate on test set
