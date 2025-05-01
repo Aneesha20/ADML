@@ -4,12 +4,13 @@ import numpy as np
 import copy
 
 def train_model(model, train_loader, val_loader, device, 
-                epochs=30, learning_rate=1e-3, alpha=0.1):
+                epochs=10, learning_rate=1e-4, alpha=0.1):
     """
     Train the model for a given number of epochs. Returns the best model (by val loss) and loss history.
     """
     criterion = nn.BCEWithLogitsLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.RMSprop(model.parameters(), lr=learning_rate, alpha=0.99, eps=1e-08, momentum=0.9)
+
     model.to(device)
     best_val_loss = float('inf')
     best_model_wts = None
