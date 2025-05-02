@@ -79,3 +79,39 @@ for idx in sample_indices:
     plt.savefig(save_path)
     plt.close()
     print(f"✅ Saved result image for test index {idx} → {save_path}")
+
+
+
+    # --- ABLATION STUDY ---
+print("\n Running Ablation Study...\n")
+ablations = [
+    {"name": "alpha=0.0", "alpha": 0.0, "lr": 1e-3},
+    {"name": "alpha=0.05", "alpha": 0.05, "lr": 1e-3},
+    {"name": "alpha=0.1", "alpha": 0.1, "lr": 1e-3},
+    {"name": "alpha=0.1_lr=1e-4", "alpha": 0.1, "lr": 1e-4},
+]
+
+results = []
+
+for config in ablations:
+    print(f"\n--- {config['name']} ---")
+    model = UNet(in_channels=1, out_channels=1, init_features=64)
+    model, _ = train_model(model, train_loader, val_loader, device,
+                           epochs=10, learning_rate=config['lr'], alpha=config['alpha'])  
+    metrics = evaluate_model(model, test_loader, device)
+    results.append({
+        "config": config['name'],
+        "xent": metrics['cross_entropy'],
+        "mse": metrics['dist_mse'],
+        "p2": metrics['precision'][2],
+        "r2": metrics['recall'][2],
+    })
+
+# Print Ablation Summary
+print("\n📋 Ablation Summary (Valence-2 Example):")
+print(f"{'Config':<20} {'XENT':<8} {'MSE':<10} {'Prec@2':<8} {'Rec@2':<8}")
+for r in results:
+    p2 = f"{r['p2']:.2f}" if r['p2'] is not None else "N/A"
+    r2 = f"{r['r2']:.2f}" if r['r2'] is not None else "N/A"
+    print(f"{r['config']:<20} {r['xent']:<8.4f} {r['mse']:<10.2f} {p2:<8} {r2:<8}")
+
